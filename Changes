@@ -1,6 +1,73 @@
+Version 1.35 - 15 Jan 2025
+
+* Bugs fixed:
+
+  https://github.com/gflohr/libintl-perl/issues/17
+
+Version 1.34 - 08 Jan 2025
+
+* Bugs fixed:
+
+  https://github.com/gflohr/libintl-perl/issues/14
+
+Version 1.33 - 14 Dec 2022
+
+* Bugs fixed:
+
+  https://github.com/gflohr/libintl-perl/issues/7
+
+* Fix POD (thanks to Ken Ibbotson).
+
+Version 1.32 - 26 Oct 2020
+
+* Bugs fixed:
+
+  https://github.com/gflohr/libintl-perl/issues/5
+
+Version 1.31 - 19 Nov 2018
+
+* Fixes this bug in Locale::Simple:
+
+  https://rt.cpan.org/Ticket/Display.html?id=127675
+
+Version 1.30 - 04 Nov 2018
+
+* Bugs fixed:
+
+  https://github.com/gflohr/libintl-perl/issues/2
+  https://github.com/gflohr/libintl-perl/issues/3
+  https://github.com/gflohr/libintl-perl/issues/4
+
+Version 1.29 - 09 Aug 2017
+
+* Important: Fixed a bug that caused Locale::gettext_pp and 
+  Locale::gettext_dumb to not load .mo files with a revision
+  number of 0.1 not to be loaded 
+  (see https://github.com/gflohr/libintl-perl/issues/1)
+* New bug tracker address is https://github.com/gflohr/libintl-perl/issues
+
+Version 1.28 - 31 Aug 2017 
+
+* New class methods options(), keywords(), and flags() for
+  Locale::TextDomain
+
+Version 1.27 - 7 Aug 2017
+
+* Bugs fixed:
+
+  https://rt.cpan.org/Public/Bug/Display.html?id=114731
+  https://rt.cpan.org/Public/Bug/Display.html?id=116772
+  https://rt.cpan.org/Public/Bug/Display.html?id=119014
+  https://rt.cpan.org/Public/Bug/Display.html?id=120165
+  https://rt.cpan.org/Public/Bug/Display.html?id=120446
+
 Version 1.26 - 13 May 2016
 
 * Fixed more false negatives in tests, no need to upgrade.
+
+* Bugs fixed:
+
+  https://rt.cpan.org/Ticket/Display.html?id=115052
 
 Version 1.25 - 09 May 2016
 

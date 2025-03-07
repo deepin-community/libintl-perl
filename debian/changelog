@@ -1,3 +1,71 @@
+libintl-perl (1.35-1) unstable; urgency=medium
+
+  * Team upload.
+  * Import upstream version 1.35.
+  * Refresh spelling.patch (offset).
+  * Declare compliance with Debian Policy 4.7.0.
+
+ -- gregor herrmann <gregoa@debian.org>  Sun, 16 Feb 2025 00:12:19 +0100
+
+libintl-perl (1.33-1) unstable; urgency=medium
+
+  * Team upload.
+
+  [ Ken Ibbotson ]
+  * Import upstream version 1.32
+  * debian/patches: remove patch CVE-2016-1238 as bug 116772 fixed upstream
+  * debian/patches: remove patch dot-inc as bug 134338 fixed upstream
+  * debian/docs: skip NEWS file as a duplicate of Changes file, which is
+    automatically picked up and added as changelog.gz
+  * debian/rules: remove .gitignore file from installed package
+  * debian/patches: passed patches upstream: 'spelling2.patch'
+
+  [ gregor herrmann ]
+  * Update years of upstream copyright.
+  * Refresh remaining patches (offset).
+
+  [ Debian Janitor ]
+  * Apply multi-arch hints.
+    + libintl-perl: Add Multi-Arch: foreign.
+
+  [ gregor herrmann ]
+  * Import upstream version 1.33.
+  * Drop pod.patch, applied upstream.
+  * Refresh spelling2.patch (offset).
+  * Declare compliance with Debian Policy 4.6.2.
+  * Remove ReleaseNotes from debian/clean.
+  * Add another lintian override.
+
+ -- gregor herrmann <gregoa@debian.org>  Thu, 22 Dec 2022 17:40:56 +0100
+
+libintl-perl (1.26-4) unstable; urgency=medium
+
+  * Team upload.
+
+  [ Debian Janitor ]
+  * Set upstream metadata fields: Bug-Database, Bug-Submit, Repository,
+    Repository-Browse.
+
+  [ gregor herrmann ]
+  * Update debian/upstream/metadata.
+  * Declare compliance with Debian Policy 4.6.0.
+  * Update Build-Depends for cross builds.
+  * Declare compliance with Debian Policy 4.6.1.
+  * Revert "Remove lintian override as unused."
+    The override re-appears after installing gettext_xs.pm.
+  * debian/rules: make dh_install's exclude more verbose.
+
+  * Run additional XS tests during build and autopkgtests.
+    This would have caught, at least by showing a warning, #1012570.
+  * debian/control: add test dependency on locales-all.
+    Needed by the XS tests.
+  * Disable one of the tests which currently fails as the module and glibc
+    disagree about the name of the second month in Austrian German.
+  * Install the missing gettext_xs.pm file.
+    Thanks to Xan Charbonnet for the bug report. (Closes: #1012570)
+
+ -- gregor herrmann <gregoa@debian.org>  Thu, 09 Jun 2022 20:51:50 +0200
+
 libintl-perl (1.26-3) unstable; urgency=medium
 
   * Take over for the Debian Perl Group; Closes: #945988 -- RFA/ITA

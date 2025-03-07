@@ -3,7 +3,7 @@
 # vim: set autoindent shiftwidth=4 tabstop=4:
 
 # Pure Perl implementation of Uniforum message translation.
-# Copyright (C) 2002-2016 Guido Flohr <guido.flohr@cantanea.com>,
+# Copyright (C) 2002-2017 Guido Flohr <guido.flohr@cantanea.com>,
 # all rights reserved.
 
 # This program is free software: you can redistribute it and/or modify
@@ -38,6 +38,7 @@ use vars qw ($__gettext_pp_default_dir
 
 use locale;
 use File::Spec;
+use Locale::Messages;
 
 BEGIN {
     $__gettext_pp_textdomain = 'messages';
@@ -347,6 +348,8 @@ sub _dcnpgettext_impl {
     return unless defined $msgid;
 
     my $plural = defined $msgid_plural;
+    Locale::Messages::turn_utf_8_off($msgid);
+    Locale::Messages::turn_utf_8_off($msgctxt) if defined $msgctxt;
     my $msg_ctxt_id = defined $msgctxt ? join($__gettext_pp_context_glue, ($msgctxt, $msgid)) : $msgid;
     
     local $!; # Do not clobber errno!
@@ -484,31 +487,8 @@ sub setlocale($;$) {
 	&POSIX::setlocale;
 }
 
-sub __load_domain
-{
-    my ($domainname, $category, $category_name, $locale) = @_;
-
-        # If no locale was selected for the requested locale category,
-        # l10n is disabled completely.  This matches the behavior of GNU
-        # gettext.
-        if ($category != LC_MESSAGES) {
-            # Not supported.
-            return [];
-        }
-        
-        if (!defined $locale && $category != 1729) {
-                $locale = POSIX::setlocale ($category);
-                if (!defined $locale || 'C' eq $locale || 'POSIX' eq $locale) {
-                        return [];
-                }
-        }
-    
-    $domainname = $__gettext_pp_textdomain
-    	unless defined $domainname && length $domainname;
-
-    my $dir = bindtextdomain ($domainname, '');
-    $dir = $__gettext_pp_default_dir unless defined $dir && length $dir;
-    return [] unless defined $dir && length $dir;
+sub __selected_locales {
+	my ($locale, $category, $category_name) = @_;
 
     my @locales;
     my $cache_key;
@@ -517,20 +497,20 @@ sub __load_domain
     	@locales = split /:/, $ENV{LANGUAGE};
     	$cache_key = $ENV{LANGUAGE};
     } elsif (!defined $locale) {
-            # The system does not have LC_MESSAGES.  Guess the value.
+        # The system does not have LC_MESSAGES.  Guess the value.
     	@locales = $cache_key = __locale_category ($category, 
     	                                           $category_name);
     } else {
             @locales = $cache_key = $locale;
     }
 
-    # Have we looked that one up already?
-    my $domains = $__gettext_pp_domain_cache->{$dir}->{$cache_key}->{$category_name}->{$domainname};
-    return $domains if defined $domains;
-    return [] unless @locales;
-    
-    my @dirs = ($dir);
-    my @tries = (@locales);
+	return $cache_key, @locales;
+}
+
+sub __extend_locales {
+	my (@locales) = @_;
+
+	my @tries = @locales;
     my %locale_lookup = map { $_ => $_ } @tries;
 
     foreach my $locale (@locales) {
@@ -543,6 +523,7 @@ sub __load_domain
     		if (defined $3) {
     			defined $2 ?
     				push @tries, $1 . $2 . $3 : push @tries, $1 . $3;
+					$locale_lookup{$tries[-1]} = $locale;
     		}
     		if (defined $2) {
     			push @tries, $1 . $2;
@@ -554,14 +535,58 @@ sub __load_domain
     		}
     	}
     }
-    	push @dirs, $__gettext_pp_default_dir
-    	if $__gettext_pp_default_dir && $dir ne $__gettext_pp_default_dir;
+
+	return \@tries, \%locale_lookup;
+}
+
+sub __load_domain {
+    my ($domainname, $category, $category_name, $locale) = @_;
+
+    # If no locale was selected for the requested locale category,
+    # l10n is disabled completely.  This matches the behavior of GNU
+    # gettext.
+    if ($category != LC_MESSAGES) {
+        # Not supported.
+        return [];
+    }
+        
+    if (!defined $locale && $category != 1729) {
+        $locale = POSIX::setlocale ($category);
+        if (!defined $locale || 'C' eq $locale || 'POSIX' eq $locale) {
+            return [];
+        }
+    }
     
-    my %seen = ();
+    $domainname = $__gettext_pp_textdomain
+    	unless defined $domainname && length $domainname;
+
+    my $dir = bindtextdomain ($domainname, '');
+    $dir = $__gettext_pp_default_dir unless defined $dir && length $dir;
+
+    return [] unless defined $dir && length $dir;
+
+	my ($cache_key, @locales) = __selected_locales $locale, $category, $category_name;
+
+    # Have we looked that one up already?
+    my $domains = $__gettext_pp_domain_cache->{$dir}->{$cache_key}->{$category_name}->{$domainname};
+    return $domains if defined $domains;
+    return [] unless @locales;
+    
+    my @dirs = ($dir);
+    my ($tries, $lookup) = __extend_locales @locales;
+
+    push @dirs, $__gettext_pp_default_dir
+		if $__gettext_pp_default_dir && $dir ne $__gettext_pp_default_dir;
+    
+    my %seen;
+	my %loaded;
     foreach my $basedir (@dirs) {
-    	foreach my $try (@tries) {
-    		my $fulldir = "$basedir/$try/$category_name";
-    		
+    	foreach my $try (@$tries) {
+			# If we had already found a catalog for "xy_XY", do not try it
+			# again.
+			next if $loaded{$try};
+
+    		my $fulldir = File::Spec->catfile($basedir, $try, $category_name);
     		next if $seen{$fulldir}++;
 
     		# If the cache for unavailable directories is removed,
@@ -570,22 +595,24 @@ sub __load_domain
     		next if $__gettext_pp_unavailable_dirs->{$fulldir};
     		++$__gettext_pp_unavailable_dirs->{$fulldir} and next
     				unless -d $fulldir;
-                        my $filename = File::Spec->catfile ($fulldir, 
-                                                            "$domainname.mo");
-    		my $domain = __load_catalog ($filename, $try);
+            my $filename = File::Spec->catfile($fulldir, "$domainname.mo");
+    		my $domain = __load_catalog $filename, $try;
     		next unless $domain;
-    			
-    		$domain->{locale_id} = $locale_lookup{$try};
+    		
+			$loaded{$try} = 1;
+
+    		$domain->{locale_id} = $lookup->{$try};
     		push @$domains, $domain;
     	}
     }
+
+    $domains = [] unless defined $domains;
+    
     $__gettext_pp_domain_cache->{$dir}
                               ->{$cache_key}
                               ->{$category_name}
                               ->{$domainname} = $domains;
 
-    $domains = [] unless defined $domains;
-    
     return $domains;
 }
 
@@ -612,13 +639,15 @@ sub __load_catalog
     my $filesize = length $raw;
     
     # Read the magic number in order to determine the byte order.
-    my $domain = {};
+    my $domain = {
+		filename => $filename
+	};
     my $unpack = 'N';
-    $domain->{potter} = unpack $unpack, substr $raw, 0, 4;
+    $domain->{magic} = unpack $unpack, substr $raw, 0, 4;
     
-    if ($domain->{potter} == 0xde120495) {
+    if ($domain->{magic} == 0xde120495) {
     	$unpack = 'V';
-    } elsif ($domain->{potter} != 0x950412de) {
+    } elsif ($domain->{magic} != 0x950412de) {
     	return;
     }
     my $domain_unpack = $unpack x 6;
@@ -627,7 +656,8 @@ sub __load_catalog
     	$hash_size, $hash_off) = 
     		unpack (($unpack x 6), substr $raw, 4, 24);
     
-    return unless $revision == 0; # Invalid revision number.
+    my $major = $revision >> 16;
+    return if $major != 0; # Invalid revision number.
     
     $domain->{revision} = $revision;
     $domain->{num_strings} = $num_strings;
@@ -691,7 +721,7 @@ sub __load_catalog
     my $code = $domain->{po_header}->{plural_forms} || '';
     
     # Whitespace, locale-independent.
-    my $s = '[ \t\r\n\013\014]';
+    my $s = '[ \011-\015]';
 
     # Untaint the plural header.
     # Keep line breaks as is (Perl 5_005 compatibility).
@@ -723,7 +753,11 @@ sub __locale_category
     my ($category, $category_name) = @_;
     
     local $@;
-    my $value = eval {POSIX::setlocale ($category)};
+    
+	# See https://github.com/gflohr/libintl-perl/issues/14!
+	no if $] >= 5.022, warnings => 'locale';
+   
+   	my $value = eval {POSIX::setlocale ($category)};
     
     # We support only XPG syntax, i. e.
     # language[_territory[.codeset]][@modifier].
@@ -845,7 +879,7 @@ Locale::gettext_pp - Pure Perl Implementation of Uniforum Message Translation
 
 =head1 SYNOPSIS
 
- use Locale::gettext_pp (:locale_h :libintl_h);
+ use Locale::gettext_pp qw(:locale_h :libintl_h);
 
  gettext $msgid;
  dgettext $domainname, $msgid;
@@ -990,7 +1024,7 @@ You can import groups of functions via two tags:
 
 =over 4
 
-=item B<use Locale::gettext_pp (':locale_h')>
+=item B<use Locale::gettext_pp qw(':locale_h')>
 
 Imports the functions that are normally defined in the C include
 file F<locale.h>:
@@ -1067,7 +1101,7 @@ Imports the locale category constants:
 
 =head1 AUTHOR
 
-Copyright (C) 2002-2016 L<Guido Flohr|http://www.guido-flohr.net/>
+Copyright (C) 2002-2017 L<Guido Flohr|http://www.guido-flohr.net/>
 (L<mailto:guido.flohr@cantanea.com>), all rights reserved.  See the source
 code for details!code for details!
 
@@ -1088,5 +1122,3 @@ perl-brace-imaginary-offset: 0
 perl-label-offset: -4
 tab-width: 4
 End:
-
-=cut

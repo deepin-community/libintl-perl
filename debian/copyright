@@ -4,7 +4,7 @@ Upstream-Contact: Guido Flohr <guido.flohr@cantanea.com>
 Upstream-Name: libintl-perl
 
 Files: *
-Copyright: (C) 2002-2016, Guido Flohr <guido.flohr@cantanea.com>
+Copyright: (C) 2002-2017, Guido Flohr <guido.flohr@cantanea.com>
 License: GPL-3+
 
 Files: debian/*
