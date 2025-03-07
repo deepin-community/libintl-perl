@@ -3,7 +3,7 @@
 # vim: set autoindent shiftwidth=4 tabstop=4:
 
 # Pure Perl implementation of Uniforum message translation.
-# Copyright (C) 2002-2016 Guido Flohr <guido.flohr@cantanea.com>,
+# Copyright (C) 2002-2017 Guido Flohr <guido.flohr@cantanea.com>,
 # all rights reserved.
 
 # This program is free software: you can redistribute it and/or modify
@@ -160,9 +160,7 @@ sub dnpgettext ($$$$$) {
     return dcnpgettext ($domainname, $msgctxt, $msgid, $msgid_plural, $n, undef);
 }
 
-sub dcnpgettext ($$$$$$) {
-    my ($domainname, $msgctxt, $msgid, $msgid_plural, $n, $category) = @_;
-
+sub __get_locale() {
     my $locale;
 
     if (exists $ENV{LANGUAGE} && length $ENV{LANGUAGE}) {
@@ -178,6 +176,14 @@ sub dcnpgettext ($$$$$$) {
         $locale = 'C';
     }
     
+    return $locale;
+}
+
+sub dcnpgettext ($$$$$$) {
+    my ($domainname, $msgctxt, $msgid, $msgid_plural, $n, $category) = @_;
+
+    my $locale = __get_locale;
+
     return Locale::gettext_pp::_dcnpgettext_impl ($domainname, $msgctxt,
                                                   $msgid, $msgid_plural, $n,
                                                   $category, $locale);
@@ -197,7 +203,7 @@ Locale::gettext_dumb - Locale unaware Implementation of Uniforum Message Transla
 
 =head1 SYNOPSIS
 
- use Locale::gettext_dumb (:locale_h :libintl_h);
+ use Locale::gettext_dumb qw(:locale_h :libintl_h);
 
  # Normally, you will not want to include this module directly but this way:
  use Locale::Messages;
@@ -331,7 +337,7 @@ variable
     
 =head1 AUTHOR
 
-Copyright (C) 2002-2016 L<Guido Flohr|http://www.guido-flohr.net/>
+Copyright (C) 2002-2017 L<Guido Flohr|http://www.guido-flohr.net/>
 (L<mailto:guido.flohr@cantanea.com>), all rights reserved.  See the source
 code for details!code for details!
 

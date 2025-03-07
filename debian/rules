@@ -9,9 +9,18 @@ TMP     = $(CURDIR)/debian/$(PACKAGE)
 	dh $@
 
 override_dh_install-indep:
-	dh_install -i --exclude=xs
+	dh_install -i --exclude=gettext_xs
 
 override_dh_installexamples:
 	dh_installexamples
 	find $(TMP)/usr/share/doc/$(PACKAGE)/examples -type f -print0 | \
 		xargs -r0 sed -E -i -e '1s|^#!\s*/usr/local/bin/perl|#!/usr/bin/perl|'
+
+	$(RM) --verbose $(TMP)/usr/share/doc/$(PACKAGE)/examples/simplecal/.gitignore
+
+override_dh_auto_test:
+	# tests/03language_xs.t has issues with Februar vs. Feber in de_AT;
+	# cf. https://github.com/gflohr/libintl-perl/issues/3
+	[ ! -f $(CURDIR)/tests/03language_xs.t ] || mv -v $(CURDIR)/tests/03language_xs.t $(CURDIR)/tests/03language_xs.skip
+	TEST_LIBINTL_PERL_XS_VERSION=1 dh_auto_test
+	[ ! -f $(CURDIR)/tests/03language_xs.skip ] || mv -v $(CURDIR)/tests/03language_xs.skip $(CURDIR)/tests/03language_xs.t

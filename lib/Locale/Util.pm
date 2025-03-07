@@ -3,7 +3,7 @@
 # vim: set autoindent shiftwidth=4 tabstop=4:
 
 # Portable methods for locale handling.
-# Copyright (C) 2002-2016 Guido Flohr <guido.flohr@cantanea.com>,
+# Copyright (C) 2002-2017 Guido Flohr <guido.flohr@cantanea.com>,
 # all rights reserved.
 
 # This program is free software: you can redistribute it and/or modify
@@ -686,6 +686,9 @@ sub set_locale {
 	
 	require POSIX;
 
+    # See https://github.com/gflohr/libintl-perl/issues/14!
+    no if $] >= 5.022, warnings => 'locale';
+
     $country = '' unless defined $country;
     $charset = '' unless defined $charset;
     
@@ -814,6 +817,9 @@ sub set_locale {
 
 sub __set_locale_windows {
 	my ($category, $language, $country, $charset) = @_;
+
+    # See https://github.com/gflohr/libintl-perl/issues/14!
+	no if $] >= 5.022, warnings => 'locale'; 
 
     my $set_locale;
 
@@ -1185,7 +1191,7 @@ production code.
 
 =head1 AUTHOR
 
-Copyright (C) 2002-2016 L<Guido Flohr|http://www.guido-flohr.net/>
+Copyright (C) 2002-2017 L<Guido Flohr|http://www.guido-flohr.net/>
 (L<mailto:guido.flohr@cantanea.com>), all rights reserved.  See the source
 code for details!code for details!
 
@@ -1206,4 +1212,3 @@ cperl-indent-level: 4
 cperl-continued-statement-offset: 2
 tab-width: 4
 End:
-=cut

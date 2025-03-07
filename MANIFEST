@@ -1,14 +1,14 @@
 COPYING		        	GNU General Public License
-ChangeLog			Detailed list of changes
 FAQ				Frequently asked questions
 MANIFEST			This list of files
 MANIFEST.SKIP                   Files to suppress in MANIFEST
 Makefile.PL			Makefile generator
 MyInstall.pm			Workaround file
 NEWS				Latest Changes
-ReleaseNotes			Same as NEWS
-README				Read it
+Changes			        Same as NEWS
+README				See README.md
 README-oldversions		Where are old versions of this module?
+README.md                       Read it
 README.solaris			Build libintl-perl on Solaris platforms
 README.win32			Build libintl-perl on MS-DOS platforms
 REFERENCES			Who uses libintl-perl?
@@ -168,6 +168,7 @@ lib/Locale/gettext_pp.pm
 lib/Locale/gettext_xs.pod
 lib/Locale/libintlFAQ.pod
 sample/README
+sample/simplecal/.gitignore
 sample/simplecal/MANIFEST
 sample/simplecal/Makefile.PL
 sample/simplecal/README-NLS
@@ -374,6 +375,7 @@ tests/04find_domain_bug.t
 tests/04scalar_noop.t
 tests/04russian_plural_function.t
 tests/05parse_accept.t
+tests/05options.t
 tests/LocaleData/de/LC_MESSAGES/additional.mo
 tests/LocaleData/de/LC_MESSAGES/existing.mo
 tests/LocaleData/de_AT/LC_MESSAGES/additional.mo
@@ -391,6 +393,5 @@ tests/po/additional.xy.po
 tests/po/additional.xy_XY.po
 tests/po/existing.xy.po
 tests/po/existing.xy_XY.po
-META.yml                                Module meta-data (added by MakeMaker)
-SIGNATURE                               Checksums and signature
+META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

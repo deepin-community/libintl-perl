@@ -1,13 +1,14 @@
 Description: Spelling corrections
-Bug-Debian: htps://bugs.debian.org/945988
-Author: Ken Ibbotson <keni@computer.org>
-Forwarded: https://rt.cpan.org/Ticket/Display.html?id=134032
 Bug: https://rt.cpan.org/Ticket/Display.html?id=134032
-Last-Update: 2021-01-10
+Bug-Debian: https://bugs.debian.org/945988
+Forwarded: https://rt.cpan.org/Ticket/Display.html?id=134032
+Author: Ken Ibbotson <keni@computer.org>
+Reviewed-by: gregor herrmann <gregoa@debian.org>
+Last-Update: 2025-02-15
 
 --- a/lib/Locale/Messages.pm
 +++ b/lib/Locale/Messages.pm
-@@ -476,7 +476,7 @@
+@@ -480,7 +480,7 @@
  =head1 FUNCTIONS
  
  The module exports by default nothing.  Every function has to be
@@ -16,16 +17,16 @@ Last-Update: 2021-01-10
  
  =over 4
  
-@@ -514,7 +514,7 @@
+@@ -518,7 +518,7 @@
  other languages (for example French or Italian) differ here.  The 
  translator of the message may therefore have a hard time to find
  a translation that will still work and not sound stupid in the 
 -target language.  Many C implementations of printf() allow to 
-+target language.  Many C implementations of printf() allow one to 
++target language.  Many C implementations of printf() allow one to
  change the order of the arguments, and a French translator could
  then say:
  
-@@ -565,7 +565,7 @@
+@@ -569,7 +569,7 @@
  from the character set used in the source code, output can be a
  mixture of two character sets.  There is no point in trying to address
  this problem in the pure Perl version of the gettext functions.  because
@@ -34,7 +35,7 @@ Last-Update: 2021-01-10
  high to pay.
  
  This all boils down to: Only use ASCII characters in your translatable
-@@ -751,7 +751,7 @@
+@@ -755,7 +755,7 @@
  The function cannot fail and always returns a true value.
  
  B<Attention:> If you use the function for setting the utf-8 flag,
@@ -43,7 +44,7 @@ Last-Update: 2021-01-10
  utf-8.  You should only use it, if you have set the environment
  variable B<OUTPUT_CHARSET> to "utf-8".  Additionally you should
  call bind_textdomain_codeset() with "utf-8" as the second
-@@ -798,7 +798,7 @@
+@@ -802,7 +802,7 @@
  
  Beginning with version 1.22 you can pass other package names than "gettext_pp"
  or "gettext_xs" and use a completely different backend.  It is the caller's
@@ -52,7 +53,7 @@ Last-Update: 2021-01-10
  interface as the two standard packages.
  
  One package that offers that functionality is Locale::gettext_dumb(3pm).
-@@ -925,7 +925,7 @@
+@@ -929,7 +929,7 @@
  
  =head1 EXPORT TAGS
  
@@ -68,7 +69,7 @@ Last-Update: 2021-01-10
  
  Returns a reference to a list of all supported charsets.  This
 -may implicitely load additional Encode(3) conversions like 
-+may implicitly load additional Encode(3) conversions like 
++may implicitly load additional Encode(3) conversions like
  Encode::HanExtra(3) which may produce considerable load on your
  system.
  
@@ -83,7 +84,7 @@ Last-Update: 2021-01-10
  
 --- a/lib/Locale/TextDomain.pm
 +++ b/lib/Locale/TextDomain.pm
-@@ -424,7 +424,7 @@
+@@ -486,7 +486,7 @@
  
  When you request a translation for a given string, the system used
  in libintl-perl follows a standard strategy to find a suitable message
@@ -92,16 +93,16 @@ Last-Update: 2021-01-10
  a name for the message catalog, libintl-perl will assume that your
  catalog is called 'messages' (unless you have changed the default
  value to something else via Locale::Messages(3pm), method textdomain()).
-@@ -499,7 +499,7 @@
+@@ -561,7 +561,7 @@
  machine, nor can you be sure that the installation routine has write 
  access to these locations.  You can therefore instruct libintl-perl 
  to search other directories prior to the default directories.  Specifying 
 -a differnt search directory is called I<binding> a textdomain to a 
-+a different search directory is called I<binding> a textdomain to a 
++a different search directory is called I<binding> a textdomain to a
  directory.
  
  Beginning with version 1.20, B<Locale::TextDomain> extends the default 
-@@ -512,7 +512,7 @@
+@@ -574,7 +574,7 @@
  using L<Module::Install>'s C<install_share> directive or the Dist::Zilla
  L<ShareDir plugin|Dist::Zilla::Plugin::ShareDir>.
  
@@ -110,7 +111,7 @@ Last-Update: 2021-01-10
  the translation files in the L<File::ShareDir> directory, it will next look in
  every directory found in the standard include path C<@INC>, and check for a
  database containing the message for your textdomain there. Example: If the
-@@ -553,7 +553,7 @@
+@@ -615,7 +615,7 @@
  If you have not installed the translation database in a directory
  F<LocaleData> in the L<File::ShareDir> directory or the standard include
  path C<@INC> (or in the system directories F</usr/share/locale> resp.
@@ -119,7 +120,7 @@ Last-Update: 2021-01-10
  path by giving the names of directories (as strings!) as additional
  arguments to use():
  
-@@ -734,7 +734,7 @@
+@@ -796,7 +796,7 @@
  know that, you will also understand the rest despite this little
  simplification ...].
  
@@ -128,7 +129,7 @@ Last-Update: 2021-01-10
  that __n() is a short-cut for: 
  
      print __n"One file has been deleted.\n", 
-@@ -780,7 +780,7 @@
+@@ -842,7 +842,7 @@
  =item B<__p MSGCTXT, MSGID>
  
  This is much like __. The "p" stands for "particular", and the MSGCTXT 
@@ -139,7 +140,7 @@ Last-Update: 2021-01-10
      print __p"Verb, to view", "View";
 --- a/lib/Locale/gettext_pp.pm
 +++ b/lib/Locale/gettext_pp.pm
-@@ -886,7 +886,7 @@
+@@ -920,7 +920,7 @@
  =head1 FUNCTIONS
  
  The module exports by default nothing.    Every function has to be
@@ -148,7 +149,7 @@ Last-Update: 2021-01-10
  
  =over 4
  
-@@ -985,7 +985,7 @@
+@@ -1019,7 +1019,7 @@
  
  =head1 EXPORT TAGS
  

@@ -1,2 +1,3 @@
 usr/lib/* usr/lib/
+usr/share/perl5/Locale/gettext_xs.pm usr/share/perl5/Locale/
 usr/share/man/man3/Locale::gettext_xs.3pm usr/share/man/man3/

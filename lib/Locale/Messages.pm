@@ -2,7 +2,7 @@
 
 # vim: set autoindent shiftwidth=4 tabstop=4:
 
-# Copyright (C) 2002-2016 Guido Flohr <guido.flohr@cantanea.com>,
+# Copyright (C) 2002-2017 Guido Flohr <guido.flohr@cantanea.com>,
 # all rights reserved.
 
 # This program is free software: you can redistribute it and/or modify
@@ -24,10 +24,14 @@ use strict;
 
 use vars qw ($package @EXPORT_OK %EXPORT_TAGS @ISA $VERSION);
 
-$VERSION = '1.26';
+$VERSION = '1.35';
 
 # Try to load the C version first.
 $package = 'gettext_xs';
+
+# Do not load from current working directory.
+local @INC = grep { $_ ne '.' } @INC;
+
 eval <<'EOF';
 require Locale::gettext_xs; 
 my $version = Locale::gettext_xs::__gettext_xs_version();
@@ -426,7 +430,7 @@ Locale::Messages - Gettext Like Message Retrieval
 
 =head1 SYNOPSIS
 
- use Locale::Messages (:locale_h :libintl_h);
+ use Locale::Messages qw(:locale_h :libintl_h);
 
  gettext $msgid;
  dgettext $textdomain, $msgid;
@@ -995,13 +999,17 @@ Imports the locale category constants:
 
 =head1 OTHER EXPORTS
 
+=over 4
+
 =item B<select_package PACKAGE>
+
+=back
 
 =head1 USAGE
 
 A complete example:
 
-    1: use Locale::Messages qw (:locale_h :libintl_h);
+    1: use Locale::Messages qw(:locale_h :libintl_h);
     2: use POSIX qw (setlocale);
     3: setlocale (LC_MESSAGES, '');
     4: textdomain ('my-package');
@@ -1035,7 +1043,7 @@ should be able to find various files with the name F<libc.mo>, the
 message catalog for the library itself.  If you have found these
 files under F</usr/share/locale>, then you can try the following:
 
-    use Locale::Messages qw (:locale_h :libintl_h);
+    use Locale::Messages qw(:locale_h :libintl_h);
     use POSIX qw (setlocale);
 
     setlocale LC_MESSAGES, "";
@@ -1052,15 +1060,14 @@ See Locale::TextDomain(3) for much simpler ways.
 
 =head1 AUTHOR
 
-Copyright (C) 2002-2016 L<Guido Flohr|http://www.guido-flohr.net/>
+Copyright (C) 2002-2017 L<Guido Flohr|http://www.guido-flohr.net/>
 (L<mailto:guido.flohr@cantanea.com>), all rights reserved.  See the source
 code for details!code for details!
 
 =head1 SEE ALSO
 
 Locale::TextDomain(3pm), Locale::gettext_pp(3pm), Encode(3pm),
-Locale::TextDomain::UTF8(3pm), perllocale(3pm), POSIX(3pm), perl(1), 
-gettext(1), gettext(3)
+perllocale(3pm), POSIX(3pm), perl(1), gettext(1), gettext(3)
 
 =cut
 

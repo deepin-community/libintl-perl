@@ -1,4 +1,3 @@
-pod.patch
+spelling2.patch
 spelling.patch
-CVE-2016-1238.patch
-dot-inc.patch
+auto-gitignore

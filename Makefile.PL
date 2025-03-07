@@ -3,7 +3,7 @@
 # vim: tabstop=4
 
 # Makefile generator for libintl-perl.
-# Copyright (C) 2002-2016 Guido Flohr <guido.flohr@cantanea.com>, 
+# Copyright (C) 2002-2017 Guido Flohr <guido.flohr@cantanea.com>, 
 # all rights reserved.
 
 # This program is free software; you can redistribute it and/or modify it
@@ -18,7 +18,7 @@
 
 # You should have received a copy of the GNU Library General Public
 # License along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1335,
 # USA.
 
 use 5.004;
@@ -199,7 +199,7 @@ sub tools_other
 	my $fragment = $self->SUPER::tools_other (@_);
 
 	$fragment =~ s/^MOD_INSTALL\s*=\s*(.*?)-MExtUtils::Install
-		/MOD_INSTALL =$1-MMyInstall/msx;
+		/MOD_INSTALL =$1-I. -MMyInstall/msx;
 
 	return $fragment;
 }
@@ -226,31 +226,36 @@ WriteMakefile (
     META_MERGE		    => {
         recommends => { 'File::ShareDir' => 0 },
         resources  => {
-            homepage   => 'http://git.guido-flohr.net/projects/libintl-perl/',
-            bugtracker => 'http://rt.cpan.org/Public/Dist/Display.html?Name=libintl-perl',
-            repository => 'git://git.guido-flohr.net/perl/libintl-perl.git',
+            homepage   => 'http://www.guido-flohr.net/en/projects/',
+            bugtracker => 'https://github.com/gflohr/libintl-perl/issues',
+            repository => 'https://github.com/gflohr/libintl-perl.git',
         },
     },
     PL_FILES                => {},
     DIR		            => [$build_gettext_xs ? ('gettext_xs') : ()],
     clean		    => { FILES => 'xs_disabled build_xs' },
-    (MM->can ('signature_target') ? (SIGN => 1) : ()),
     # If you want to build the XS version although the automatic detection
     # suggests not to build it, uncomment the following line.
     #DIR => [ ('gettext_xs') ],
 );
 
 sub MY::postamble {
+        # This is for developers only.
+        return '' if ! -e '.git';
+
         '
-all :: Credits ReleaseNotes
+all :: Credits Changes README
 
 # Make search.cpan.org happy but still follow GNU standards:
 # # (Thanks to Graham Barr for the hint)
 Credits: THANKS
 	cat THANKS >$@
 
-ReleaseNotes: NEWS
+Changes: NEWS
 	cat NEWS >$@
+
+README: README.md
+	cat README.md >$@
 '
 }
 

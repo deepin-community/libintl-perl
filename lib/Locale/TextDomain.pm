@@ -3,7 +3,7 @@
 # vim: set autoindent shiftwidth=4 tabstop=4:
 
 # High-level interface to Perl i18n.
-# Copyright (C) 2002-2016 Guido Flohr <guido.flohr@cantanea.com>,
+# Copyright (C) 2002-2017 Guido Flohr <guido.flohr@cantanea.com>,
 # all rights reserved.
 
 # This program is free software: you can redistribute it and/or modify
@@ -66,7 +66,7 @@ use Cwd qw (abs_path);
 
 use vars qw ($VERSION);
 
-$VERSION = '1.26';
+$VERSION = '1.35';
 
 require Exporter;
 
@@ -98,6 +98,68 @@ BEGIN {
             last;
         }
     }
+}
+
+# Class methods.
+sub keywords {
+    join ' ', (
+        '--keyword=__',
+        '--keyword=%__',
+        '--keyword=$__',
+        '--keyword=__x',
+        '--keyword=__n:1,2',
+        '--keyword=__nx:1,2',
+        '--keyword=__xn:1,2',
+        '--keyword=__p:1c,2',
+        '--keyword=__px:1c,2',
+        '--keyword=__np:1c,2,3',
+        '--keyword=__npx:1c,2,3',
+        '--keyword=N__',
+        '--keyword=N__n:1,2',
+        '--keyword=N__p:1c,2',
+        '--keyword=N__np:1c,2,3',
+    );
+}
+
+sub flags {
+    join ' ', (
+        '--flag=__:1:pass-perl-format',
+        '--flag=%__:1:pass-perl-format',
+        '--flag=$__:1:pass-perl-format',
+        '--flag=__x:1:perl-brace-format',
+        '--flag=__x:1:pass-perl-format',
+        '--flag=__n:1:pass-perl-format',
+        '--flag=__n:2:pass-perl-format',
+        '--flag=__nx:1:perl-brace-format',
+        '--flag=__nx:1:pass-perl-format',
+        '--flag=__nx:2:perl-brace-format',
+        '--flag=__nx:2:pass-perl-format',
+        '--flag=__xn:1:perl-brace-format',
+        '--flag=__xn:1:pass-perl-format',
+        '--flag=__xn:2:perl-brace-format',
+        '--flag=__xn:2:pass-perl-format',
+        '--flag=__p:2:pass-perl-format',
+        '--flag=__px:2:perl-brace-format',
+        '--flag=__px:2:pass-perl-format',
+        '--flag=__np:2:pass-perl-format',
+        '--flag=__np:3:pass-perl-format',
+        '--flag=__npx:2:perl-brace-format',
+        '--flag=__npx:2:pass-perl-format',
+        '--flag=__npx:3:perl-brace-format',
+        '--flag=__npx:3:pass-perl-format',
+        '--flag=N__:1:pass-perl-format',
+        '--flag=N__n:1:pass-perl-format',
+        '--flag=N__n:2:pass-perl-format',
+        '--flag=N__p:2:pass-perl-format',
+        '--flag=N__np:2:pass-perl-format',
+        '--flag=N__np:3:pass-perl-format',
+    );
+}
+
+sub options {
+    my ($class) = @_;
+
+    join ' ', $class->keywords, $class->flags;
 }
 
 # Normal gettext.
@@ -325,9 +387,9 @@ sub __find_domain ($)
 	my $try_dirs = $bound_dirs{$domain};
 	
 	if (defined $try_dirs) {
-		my $found_dir = '';
+		my $found_dir;
 		
-		TRYDIR: foreach my $dir (map { abs_path $_ } grep { -d $_ } @$try_dirs) {
+		TRYDIR: foreach my $dir (grep { -d $_ } @$try_dirs) {
 			# Is there a message catalog?  We have to search recursively
 			# for it.  Since globbing is reported to be buggy under
 			# MS-DOS, we roll our own version.
@@ -350,7 +412,7 @@ sub __find_domain ($)
 		
 		# If there was no success, this will fall back to the default search
 		# directories.
-		bindtextdomain $domain => $found_dir;
+		bindtextdomain $domain => abs_path $found_dir if defined $found_dir;
     }
     
     # The search has completed.
@@ -851,7 +913,7 @@ support it, so here it is.
 
 This function was introduced in libintl-perl 1.17.
 
-=item B<N__ (ARG1, ARG2, ...)>
+=item B<N__(ARG1)>
 
 A no-op function that simply echoes its arguments to the caller.  Take
 the following piece of Perl:
@@ -916,6 +978,7 @@ Marks B<MSGID> as N__() does, but in the context B<MSGCTXT>.
 =item B<N__np (MSGCTXT, MSGID, MSGID_PLURAL, COUNT)>
 
 Marks B<MSGID> as N__n() does, but in the context B<MSGCTXT>.
+
 =back
 
 =head1 EXPORTED VARIABLES
@@ -959,6 +1022,55 @@ Never use the tied hash interpolated strings!
 A reference to C<%__>, in case you prefer:
 
      my $title = "<h1>$__->{'My Homepage'}</h1>";
+
+=back
+
+=head1 CLASS METHODS
+
+The following class methods are defined:
+
+=over 4
+
+=item B<options>
+
+Returns a space-separated list of all '--keyword' and all '--flag' options
+for B<xgettext(1)>, when extracing strings from Perl source files localized
+with B<Locale::TextDomain>.
+
+The option should rather be called B<xgettextDefaultOptions>.  With regard
+to the typical use-case, a shorter name has been picked:
+
+    xgettext `perl -MLocale::TextDomain -e 'print Locale::TextDomain->options'`
+
+See L<https://www.gnu.org/software/gettext/manual/html_node/xgettext-Invocation.html>
+for more information about the xgettext options '--keyword' and '--flag'.
+
+If you want to disable the use of the xgettext default keywords, you
+should pass an option '--keyword=""' to xgettext before the options returned
+by this method.
+
+If you doubt the usefulness of this method, check the output on the
+command-line:
+
+    perl -MLocale::TextDomain -e 'print Locale::TextDomain->options'
+
+Nothing that you want to type yourself.
+
+This method was added in libintl-perl 1.28.
+
+=item B<keywords>
+
+Returns a space-separated list of all '--keyword' options for B<xgettext(1)> 
+so that all translatable strings are properly extracted.
+
+This method was added in libintl-perl 1.28.
+
+=item B<flags>
+
+Returns a space-separated list of all '--flag' options for B<xgettext(1)> 
+so that extracted strings are properly flagged.
+
+This method was added in libintl-perl 1.28.
 
 =back
 
@@ -1040,7 +1152,7 @@ overhead for the function calls.
 
 =head1 AUTHOR
 
-Copyright (C) 2002-2016 L<Guido Flohr|http://www.guido-flohr.net/>
+Copyright (C) 2002-2017 L<Guido Flohr|http://www.guido-flohr.net/>
 (L<mailto:guido.flohr@cantanea.com>), all rights reserved.  See the source
 code for details!code for details!
 
@@ -1062,4 +1174,3 @@ cperl-indent-level: 4
 cperl-continued-statement-offset: 2
 tab-width: 4
 End:
-=cut
